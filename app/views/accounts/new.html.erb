@@ -1,0 +1,16 @@
+<h1>Register Account</h1>
+
+Register a twitter account.
+
+<% form_for(@account) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+	Login: <%= f.text_field "login"%>
+	</p><p>
+	Password: <%= f.text_field "password"%>
+    <%= f.submit "Create" %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', accounts_path %>

@@ -1,0 +1,13 @@
+<h1>Twitter Account: <%= @account.login %>
+<h2>Info</h2>
+<%=h Twitter::User.attributes.inspect %>
+<br>
+<%=h @me.inspect %>
+<h2>Friends listed in db</h2>
+<ul>
+<% for friend in @account.friends do -%>
+	<li><a href='http://twitter.com/<%=h friend.login%>' class='url'>
+		<img alt='<%=h friend.login%>' class='photo fn' src='<%= friend.profile_image_url%>' height='48' width='48'>
+	</a><br><%= friend.profile_image_url%></li>
+<% end -%>
+</ul>

@@ -1,0 +1,21 @@
+<h1>Twitter Account: <%= @account.login %>
+<h2>Groups</h2>
+
+<table>
+  <tr>
+	<td><%= link_to 'Default group', account_messages_path(@account) %> (all friends)</td>
+	<td>&nbsp;</td>
+  </tr>
+<% for group in @groups %>
+  <tr>
+	<td><%= link_to h(group.group_name), account_group_path(@account, group) %> (<%=h group.members.count %> members)</td>
+    <td> 
+		<%= link_to 'Edit', edit_account_group_path(@account, group) %> |
+		<%= link_to 'Destroy', account_group_path(@account, group), :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end if @groups && !@groups.empty? %>
+</table>
+
+<br />
+
+<%= link_to 'New group', new_account_group_path(@account) %>

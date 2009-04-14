@@ -1,0 +1,19 @@
+<h1>Your accounts</h1>
+<% if @accounts.empty? -%>
+	<p>You have no accounts. You should create one soon!</p>
+<% else -%>
+	<ul>
+		<% for account in @accounts do -%>
+		<li>Twitter account: <%=link_to account.login, "/accounts/view/#{account.id}"%> 
+			<%= account.groups.count %> Groups. 
+			Actions: 
+			<%= link_to 'Info', account_info_url(account) %> |
+			<%= link_to 'Edit', edit_account_path(account) %> |
+			<%= link_to 'Delete', account, :confirm => 'Are you sure?', :method => :delete %></td>
+		</li>
+		<% end -%>
+	</ul>
+<% end -%>
+<p>
+	Actions: <%= link_to 'Create Account', :action => :new %>
+</p>

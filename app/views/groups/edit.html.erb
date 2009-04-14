@@ -1,0 +1,63 @@
+<style>
+.draggable {
+	    cursor: -moz-grab;
+}
+
+.user-container {
+	overflow-y: scroll;
+	min-height: 350px;
+	max-height: 350px;
+	width: 350px;
+	min-width: 350px;
+}
+</style>
+<h2>Editing <%=h @group.group_name %></h2>
+<p>
+Drag Users into the group's box to add them to the group. Drag users back into your friends box to remove them from the group.
+</p>
+<table width="80%">
+	<tr><td valign='top'>
+<ul id='friends' class='user-container'>
+<% for friend in @friends[(@page-1)*100, @page*100] do -%>
+	<li class='friend draggable' id='account_<%= friend.login%>'>
+		<% unless @group.contains_by_name(friend.login) -%>
+			<%= display_account(friend, true) %>
+		<% end -%>
+	</li>
+<% end -%>
+</ul>
+</td><td valign='top'>
+	<ul id='members' class='user-container'>
+		<% for member in @group.members do -%>
+			<li class='member draggable' id='account_<%= member.login%>'>
+					<%= display_account(member, true) %>
+			</li>
+		<% end -%>
+	</ul>
+	</td></tr>
+	</table>
+<% form_for([@account, @group]) do |f| %>
+  <%= f.error_messages %>
+  <p>
+    <%= f.submit "Done" %>
+  </p>
+<% end %>
+
+<p>
+	Pages: <% for p in (1..@page_count) do -%>
+	<%= link_to p, edit_account_group_path(@account, @group, {:page => p}) %>&nbsp;
+	<% end -%>
+</p>
+<%= sortable_element :friends, 
+		{:format => '/account_(.*)$/',
+		 :constraint => false, 
+		:containment => ['friends', 'members'], 
+		:dropOnEmpty => true,
+		} %>
+<%= sortable_element :members, 
+		{:format => '/account_(.*)$/',
+		 :constraint => false, 
+		:containment => ['friends', 'members'], 
+		:dropOnEmpty => true,
+		:url    => {:action=>:add, :id => @group, :account_id => @account}
+		} %>

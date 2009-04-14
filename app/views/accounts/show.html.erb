@@ -1,0 +1,183 @@
+<style>
+#group-list {
+	float: left;
+}
+
+#group-list ul{
+	list-style: none;
+	padding-left: 0;
+}
+
+.group-actions {
+	padding: 0 1em;
+	margin: 2px 0;
+}
+</style>
+<style>
+    #tabs{
+        margin-left: 4px;
+        padding: 0;
+        background: transparent;
+        voice-family: "\"}\"";
+        voice-family: inherit;
+        padding-left: 5px;
+    }
+    #tabs ul{
+        font: bold 11px Arial, Verdana, sans-serif;
+        margin:0;
+        padding:0;
+        list-style:none;
+    }
+    #tabs li{
+        display:inline;
+        margin:0 2px 0 0;
+        padding:0;
+        text-transform:uppercase;
+    }
+    #tabs a{
+        float:left;
+        background-color:#A3BBE6;
+        margin:0 2px 0 0;
+        text-decoration:none;
+        display:block;
+        padding:4px 9px 2px 6px;
+    }
+    #tabs a {float:none;}
+    #tabs a:hover{background-color: #7E94B9;color: white;}
+    #tabs a:hover {background-color: #7E94B9;}
+    #tabHeaderActive, #tabHeaderActive a { background-color: #42577B; color:#fff;}
+</style>
+<style>
+/* Loading box of width=height=100px with a spinner placed at the center */
+#loading {
+	width:100px;
+	height: 110px;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	background:url(/images/spinner-large.gif) no-repeat center #fff;
+	text-align:center;
+	padding:10px;
+	font:normal 16px Tahoma, Geneva, sans-serif;
+	border:1px solid #666;
+	margin-left: -50px;
+	margin-top: -50px;
+	z-index:2;
+	overflow: auto;
+}
+</style>
+
+<script>
+/*-----------------------------------------------------------
+    Toggles element's display value
+    Input: any number of element id's
+    Output: none 
+    ---------------------------------------------------------*/
+function toggleDisp() {
+    for (var i=0;i<arguments.length;i++){
+        var d = $(arguments[i]);
+        if (d.style.display == 'none')
+            d.style.display = 'block';
+        else
+            d.style.display = 'none';
+    }
+}
+/*-----------------------------------------------------------
+    Toggles tabs - Closes any open tabs, and then opens current tab
+    Input:     1.The number of the current tab
+                    2.The number of tabs
+                    3.(optional)The number of the tab to leave open
+                    4.(optional)Pass in true or false whether or not to animate the open/close of the tabs
+    Output: none 
+    ---------------------------------------------------------*/
+currentTab = 0;
+function toggleTab(num,numelems,opennum,animate) {
+    if (currentTab != num){
+        for (var i=1;i<=numelems;i++){
+            if ((opennum == null) || (opennum != i)){
+                var temph = 'tabHeader'+i;
+                var h = $(temph);
+                if (!h){
+                    var h = $('tabHeaderActive');
+                    h.id = temph;
+                }
+            }
+        }
+        var h = $('tabHeader'+num);
+        if (h)
+            h.id = 'tabHeaderActive';
+        h.blur();
+        // if (animate || typeof animate == 'undefined'){
+        //     Effect.toggle('tabContent'+num,'blind',{duration:0.5, queue:{scope:'menus', position:'end', limit: 3}});
+        // }else{
+        //     toggleDisp('tabContent'+num);
+        // }
+    }
+}
+
+function switchGroup(tabIdx, groupId) {
+	toggleTab(tabIdx, <%= @groups.size + 1 %>)
+	updateContentPane(groupId);
+}
+function updateContentPane(groupId) {
+	new Ajax.Updater('group-content', 
+					'/accounts/<%= @account.id%>/groups/' + groupId, 
+					{asynchronous:true, evalScripts:true, method:'get'}); 
+	return false;
+}
+</script>
+<form action="/accounts/view" method="get">
+	Twitter Account: 
+	<select id="account_id" name="id" onchange="this.form.submit();">
+		<% for account in current_user.accounts do -%>
+		<option <%= account.id == @account.id ? 'selected' : '' %> value="<%= account.id%>"><%=h account.login %></option>
+		<% end %>
+	</select>
+</form>	
+	
+<% default_tab_idx = 1 if @account.last_group_id == 0 %>
+<div class="tabs" id="group-list">
+<h3>Groups</h3>
+<ul>
+  <li class="group-toggle" id="tabHeader1">
+	<%= link_to_function 'Default group', 'switchGroup(1, 0);' %>
+	<p class='group-actions'>
+		(all friends)
+	</p>
+  </li>
+<% i=2; for group in @groups %>
+  <% default_tab_idx = i if @account.last_group_id == group.id %>
+  <li class="group-toggle" id="tabHeader<%= i%>">
+	<%= link_to_function h(group.group_name), "switchGroup(#{i}, #{group.id});" %>
+		<p class='group-actions'>
+		<%= link_to image_tag('edit_group.png', {:title => 'Edit Group Membership'}), edit_account_group_path(@account, group) %> |
+		<%= link_to image_tag('delete_group.png', {:title => 'Delete Group'}), account_group_path(@account, group), :confirm => 'Are you sure? There is no undo.', :method => :delete %>
+		</p>
+  </li>
+<% i=i+1; end if @groups && !@groups.empty? %>
+</ul>
+<%= link_to image_tag('new_group.png', {:title => 'New Group'}), new_account_group_path(@account) %>
+</div>
+
+<span id='loading'>
+Loading...
+</span>
+
+<div id="group-content">
+</div>
+<script>
+document.observe("dom:loaded", function() {
+	$('loading').hide();
+	Ajax.Responders.register({
+		onCreate: function() {
+			new Effect.Opacity('group-content', { from: 1.0, to: 0.3, duration: 0.3 });
+			$('loading').appear();
+		},
+		onComplete: function() {
+			new Effect.Opacity('group-content', { from: 0.3, to: 1, duration: 0.3 });
+			$('loading').hide();
+		}
+	});
+	switchGroup(<%= default_tab_idx%>, <%= @account.last_group_id%>);
+});
+</script>

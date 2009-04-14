@@ -1,0 +1,44 @@
+<!--
+<li class="hentry status u-Agent_M" id="status_1290457272">
+	<span class="thumb vcard author">
+		<a href="http://twitter.com/Agent_M" class="url">
+			<img alt="Agent M" class="photo fn" src="http://s3.amazonaws.com/twitter_production/profile_images/21969412/3020972_normal.jpg" height="48" width="48">
+		</a>
+	</span>
+	<span class="status-body">
+		<strong><a href="http://twitter.com/Agent_M" class="screen-name" title="Agent M">Agent_M</a></strong>
+		<span class="entry-content">
+			CONTENT
+		</span>
+		<span class="meta entry-meta">
+			<a href="http://twitter.com/Agent_M/status/1290457272" class="entry-date" rel="bookmark">
+				<span class="published">3 minutes ago</span>
+			</a> 
+			<span>from <a href="http://twitpic.com/">TwitPic</a></span> 
+		</span>
+	</span>
+	<span class="actions"><div><a class="fav-action non-fav" id="status_star_1290457272" title="favorite this update">&nbsp;&nbsp;</a><a class="reply" href="/home?status=@Agent_M%20&amp;in_reply_to_status_id=1290457272&amp;in_reply_to=Agent_M" title="reply to Agent_M">&nbsp;&nbsp;</a></div></span></li>
+-->
+
+<li class="hentry hslice">
+	<span class="vcard thumb author">
+		<% if twit.sender %>
+			<a href='http://twitter.com/<%=h twit.sender.login%>' class='url'>
+				<img alt='<%=h twit.sender.login%>' class='photo fn' src='<%= twit.sender.profile_image_url%>' height='48' width='48'>
+			</a>
+		<% else -%>
+			unknown
+		<% end -%>
+	</span>
+	<span class="update-body">
+		<strong><a href='http://twitter.com/<%=h twit.sender.login%>' class='url fn'><%=h twit.sender.login %></a></strong>
+		<span class="entry-title entry-content">
+		<%=highlight_twit twit.message %>
+		</span>
+		<span class="meta entry-meta">
+			<a href="http://twitter.com/<%=h twit.sender.login %>/status/<%= twit.message_id%>/" rel="bookmark">
+				<abbr class="updated published" title="<%= twit.created_at%>"><%= time_ago_in_words twit.created_at%> ago</abbr>
+			</a> from <span class="generator">web</span>
+		</span>
+	</span>
+</li>

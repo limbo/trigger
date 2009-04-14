@@ -1,0 +1,40 @@
+<div class="columns">
+  	<div id="content">
+		<div class="inner-wrapper hfeed">
+			<div class="content-header"><h1>All Messages</h1></div>
+			<p>
+				Current user: <%=h @account.login%>
+				<br>
+				Collected <%= @msgs.size %> new messages.
+			</p>
+			<% if @db_msgs.nil? || @db_msgs.empty? -%>
+			<p>
+				No new messages for you.
+			</p>
+			<% else -%>
+				<ol id="updates">
+				<% for msg in @db_msgs do -%>
+						<%=render :partial => 'twit', :locals => {:twit => msg}%>
+				<% end -%>
+				</ol>
+			<% end -%>
+		</div>
+	</div>
+	
+	<div id="sidebar">
+		<div class='section'>
+			<div class='hd'>
+				<h2>Viewing Messages From</h2>
+			</div> 
+			<div class='bd'>
+				<ul>
+					<% for member in @members do -%>
+					<li>
+						<%= member.screen_name%>
+					</li>
+					<% end -%>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
