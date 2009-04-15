@@ -1,0 +1,10 @@
+<% form_tag(account_groups_path(@account)) do %>
+<p>
+	Create a new group from people in these search results
+</p>
+
+<%= hidden_field_tag "group[group_name]", params[:q]%>
+<%= hidden_field_tag "members", @updates.map{|update| update.sender.id}.uniq.join(',')%>
+<%= submit_tag "Create" %>
+<% end %>
+<%= render :partial => 'group'%>

@@ -1,0 +1,17 @@
+* Add dynamic filtering
+* Add filtering by keyword
+* Add group creation by search results
+* Search for friends who mention keyword 'foo'
+* Search twitter for people who mention keyword 'foo'
+* Support add/remove friends from trig.gr
+* Move twit storage to inverse index
+* Compare storage options for twit storage - inverse index vs. relational db vs. combo
+* Add support to edit group's name
+* Store dynamic filters
+* Automate fetching of twits
+* Manage automated fetching of twits to not overflow API limits
+* Manage priorities of tasks
+* Add immediate background tasks
+* Add support for replies/mentions
+* Add replies/mentions filter
+* Fix the default group hack

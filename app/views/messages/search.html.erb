@@ -1,0 +1,35 @@
+<div class="columns">
+  	<div id="content">
+		<div class="inner-wrapper hfeed">
+			<div class="content-header"><h1>Search results</h1></div>
+			<% if @messages.nil? || @messages.empty? -%>
+			<p>
+				No matching messages found.
+			</p>
+			<% else -%>
+				<ol id="updates">
+				<% for msg in @messages do -%>
+						<%=render :partial => 'twit', :locals => {:twit => msg}%>
+				<% end -%>
+				</ol>
+			<% end -%>
+		</div>
+	</div>
+	
+	<div id="sidebar">
+		<div class='section'>
+			<div class='hd'>
+				<h2>Viewing Messages From</h2>
+			</div> 
+			<div class='bd'>
+				<ul>
+					<% for member in @members do -%>
+					<li>
+						<%= member.screen_name%>
+					</li>
+					<% end -%>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
