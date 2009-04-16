@@ -1,0 +1,48 @@
+<div class="columns">
+  	<div id="content">
+		<div class="inner-wrapper hfeed">
+			<% if @updates.nil? || @updates.empty? -%>
+			<p>
+				No messages from <%= @group_name%>.
+			</p>
+			<% else -%>
+				<ol id="users">
+					<%
+					users = @updates.group_by(&:sender)
+					%>
+					<% for user in users.keys do -%>
+						<li>
+							<%= link_to_function display_account(user, true), "Element.toggle('#{user.login}-updates', 'display')", :title => "Show/Hide updates from #{user.login}" %>
+							<ol class="updates" id="<%= user.login%>-updates" style="display: none;">
+								<% for msg in users[user] -%>
+									<%= render :partial => 'messages/twit', :locals => {:twit => msg}%>
+								<% end -%>
+							</ol>
+						</li>
+					<% end -%>
+				</ol>
+			<% end -%>
+		</div>
+	</div>
+	
+	<div id="sidebar">
+		<div class='section'>
+			<div class='hd'>
+				<h3>Group: <%= @group_name %></h3>
+			</div>
+			<div class='bd'>
+				<form id="search-form" action="<%= url_for group_search_path(@account, @group)%>" method="get"><fieldset>
+			        <input type="text" id="search" name="q" />
+			        <input type="submit" value="search" />
+			      </fieldset></form>
+				<ul>
+					<% for member in @members do -%>
+					<li>
+						<%= link_account(member, false) %>
+					</li>
+					<% end -%>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
