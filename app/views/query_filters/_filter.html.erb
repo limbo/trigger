@@ -3,7 +3,7 @@
 		<div class="inner-wrapper hfeed">
 			<% if @updates.nil? || @updates.empty? -%>
 			<p>
-				No messages from <%= @group_name%>.
+				No messages from <%= @query_filter_name%>.
 			</p>
 			<% else -%>
 				<ol class="updates">
@@ -18,7 +18,7 @@
 	<div id="sidebar">
 		<div class='section'>
 			<div class='hd'>
-				<h3>Group: <%= @filter_name %></h3>
+				<h3>Filter: <%= @query_filter_name %></h3>
 			</div>
 			<div class='bd'>
 				<form id="search-form" action="<%= url_for group_search_path(@account, @group)%>" method="get"><fieldset>

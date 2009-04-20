@@ -1,19 +1,4 @@
 <style>
-#group-list {
-	float: left;
-}
-
-#group-list ul{
-	list-style: none;
-	padding-left: 0;
-}
-
-.group-actions {
-	padding: 0 1em;
-	margin: 2px 0;
-}
-</style>
-<style>
     #tabs{
         margin-left: 4px;
         padding: 0;
@@ -43,8 +28,6 @@
         padding:4px 9px 2px 6px;
     }
     #tabs a {float:none;}
-    #tabs a:hover{background-color: #7E94B9;color: white;}
-    #tabs a:hover {background-color: #7E94B9;}
     #tabHeaderActive, #tabHeaderActive a { background-color: #42577B; color:#fff;}
 </style>
 <style>
@@ -116,13 +99,23 @@ function toggleTab(num,numelems,opennum,animate) {
 }
 
 function switchGroup(tabIdx, groupId) {
-	toggleTab(tabIdx, <%= @groups.size + 1 %>)
-	updateContentPane(groupId);
+	toggleTab(tabIdx, <%= @filters.size %>)
+	updateContentPane(groupId, true);
 }
-function updateContentPane(groupId) {
-	new Ajax.Updater('group-content', 
+function switchFilter(tabIdx, filterId) {
+	toggleTab(tabIdx, <%= @filters.size %>)
+	updateContentPane(filterId, false);
+}
+function updateContentPane(groupId, isGroup) {
+	if (isGroup) {
+		new Ajax.Updater('group-content', 
 					'/accounts/<%= @account.id%>/groups/' + groupId, 
 					{asynchronous:true, evalScripts:true, method:'get'}); 
+	} else {
+		new Ajax.Updater('group-content', 
+					'/accounts/<%= @account.id%>/query_filters/' + groupId, 
+					{asynchronous:true, evalScripts:true, method:'get'}); 
+	}
 	return false;
 }
 </script>
@@ -135,28 +128,19 @@ function updateContentPane(groupId) {
 	</select>
 </form>	
 	
-<% default_tab_idx = 1 if @account.last_group_id == 0 %>
+<% default_tab_idx = 1 if (@account.last_group_id.nil? or @account.last_group_id == 0) %>
 <div class="tabs" id="group-list">
 <h3>Groups</h3>
 <ul>
-  <li class="group-toggle" id="tabHeader1">
-	<%= link_to_function 'Default group', 'switchGroup(1, 0);' %>
-	<p class='group-actions'>
-		(all friends)
-	</p>
-  </li>
-<% i=2; for group in @groups %>
-  <% default_tab_idx = i if @account.last_group_id == group.id %>
+<% i=1; for filter in @filters %>
+  <% default_tab_idx = i if @account.last_group_id == filter.id %>
   <li class="group-toggle" id="tabHeader<%= i%>">
-	<%= link_to_function h(group.group_name), "switchGroup(#{i}, #{group.id});" %>
-		<p class='group-actions'>
-		<%= link_to image_tag('edit_group.png', {:title => 'Edit Group Membership'}), edit_account_group_path(@account, group) %> |
-		<%= link_to image_tag('delete_group.png', {:title => 'Delete Group'}), account_group_path(@account, group), :confirm => 'Are you sure? There is no undo.', :method => :delete %>
-		</p>
+	<%= render :partial => filter.type.downcase, :locals => {:filter => filter, :i => i} %>
   </li>
-<% i=i+1; end if @groups && !@groups.empty? %>
+<% i=i+1; end if @filters && !@filters.empty? %>
 </ul>
-<%= link_to image_tag('new_group.png', {:title => 'New Group'}), new_account_group_path(@account) %>
+<%= link_to image_tag('new_group.png', {:title => 'New Group'}), new_account_group_path(@account) %> |
+<%= link_to image_tag('new_group.png', {:title => 'New Filter'}), new_account_query_filter_path(@account) %>
 </div>
 
 <span id='loading'>

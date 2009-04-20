@@ -1,0 +1,17 @@
+<h1>Twitter Account: <%= @account.login %>
+<h2>Filters</h2>
+
+<table>
+<% for filter in @filters %>
+  <tr>
+	<td><%= link_to h(filter.filter_name), account_query_filter_path(@account, filter) %> (Query: <%=h filter.query %>)</td>
+    <td> 
+		<%= link_to 'Edit', edit_account_query_filter_path(@account, filter) %> |
+		<%= link_to 'Destroy', account_query_filter_path(@account, filter), :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end if @filters && !@filters.empty? %>
+</table>
+
+<br />
+
+<%= link_to 'New filter', new_account_query_filter_path(@account) %>

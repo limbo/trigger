@@ -11,7 +11,16 @@
 	min-width: 350px;
 }
 </style>
-<h2>Editing <%=h @group.group_name %></h2>
+<h2>Editing <%=h @group.filter_name %></h2>
+<h3>Rename Group</h3>
+<% form_for([@account, @group]) do |f| %>
+  <%= f.error_messages %>
+  <p>
+	<%= f.text_field :filter_name %>
+    <%= f.submit "Rename" %>
+  </p>
+<% end %>
+<h3>Group Membership</h3>
 <p>
 Drag Users into the group's box to add them to the group. Drag users back into your friends box to remove them from the group.
 </p>
@@ -35,13 +44,7 @@ Drag Users into the group's box to add them to the group. Drag users back into y
 		<% end -%>
 	</ul>
 	</td></tr>
-	</table>
-<% form_for([@account, @group]) do |f| %>
-  <%= f.error_messages %>
-  <p>
-    <%= f.submit "Done" %>
-  </p>
-<% end %>
+</table>
 
 <p>
 	Pages: <% for p in (1..@page_count) do -%>

@@ -4,7 +4,7 @@ class GroupsController < ApplicationController
   # GET /groups
   # GET /groups.xml
   def index
-    @groups = @account.groups
+    @groups = @account.filters
 
     respond_to do |format|
       format.html # index.html.erb
@@ -15,18 +15,21 @@ class GroupsController < ApplicationController
   # GET /groups/1
   # GET /groups/1.xml
   def show
-    if params[:id].to_i != 0
-      @group = @account.groups.find(params[:id])
-      @updates = Update.find_all_by_sender_id(@group.members.collect {|m| m.id}, :limit => 20, :order => 'message_id DESC', :include => :sender)
-      @group_name = @group.group_name
-      @members = @group.members
+    if params[:id].nil?
+      if !@account.last_group_id.nil? && @account.last_group_id != 0
+        @group = @account.default_group
+      else
+        @group = @account.last_group
+      end
     else
-      @group_name = 'default'
-      @members = @account.friends
-      @updates = Update.find(:all, :order => 'message_id DESC', :limit => 20, :include => :sender)
+      @group = @account.filters.find(params[:id])
     end
     
-    if (@account.last_group_id != params[:id].to_i)
+    @updates = Update.find_all_by_sender_id(@group.members.collect {|m| m.id}, :limit => 20, :order => 'message_id DESC', :include => :sender)
+    @filter_name = @group.filter_name
+    @members = @group.members
+    
+    if (@account.last_group_id != @group.id)
       @account.last_group_id = params[:id]
       @account.save
     end
@@ -37,6 +40,21 @@ class GroupsController < ApplicationController
     end
   end
 
+  # GET /groups/1/search?q=food
+  def search
+    if params[:id].nil?
+      @group = @account.default_group
+    else
+      @group = @account.filters.find(params[:id])
+    end
+    
+    query = "message:#{params[:q]} AND (#{@group.members.collect {|m| 'sender_id:' + m.id.to_s}.join(' || ')})"
+    puts query
+    @updates = Update.find_with_ferret(query, {:sort => Ferret::Search::SortField.new(:message_id, :type => :integer, :reverse => true)})
+    @filter_name = @group.filter_name
+    @members = @group.members
+  end
+  
   # GET /groups/new
   # GET /groups/new.xml
   def new
@@ -55,11 +73,12 @@ class GroupsController < ApplicationController
     @page = params[:page].nil? ? 1 : params[:page].to_i
     @friends = @account.friends
     
-    @group = Group.find(params[:id])
+    @group = @account.filters.find(params[:id])
+    logger.debug "Group members: #{@group.members.length}"
   end
 
   def add
-    @group = @account.groups.find(params[:id])
+    @group = @account.filters.find(params[:id])
     
     #add user to group
     @membership = params[:members]
@@ -81,7 +100,7 @@ class GroupsController < ApplicationController
   end
   
   def remove
-    @group = @account.groups.find(params[:id])
+    @group = @account.filters.find(params[:id])
     @user = Account.find_by_login(params[:user]) rescue nil
     
     @friends = fetch_friends(@account)
@@ -97,10 +116,21 @@ class GroupsController < ApplicationController
   # POST /groups.xml
   def create
     @group = Group.new(params[:group])
+    @group.is_default = false
     @group.owner = @account
+    if params[:members]
+      for id in params[:members].split(',') do
+        member = @group.owner.friends.find_by_id(id)
+        logger.debug "Adding #{member.inspect}"
+        @group.members << member if member
+      end
+    end
+    logger.debug "Group members: #{@group.members.length}"
     
     respond_to do |format|
       if @group.save
+        logger.debug "Group members: #{@group.members.length}"
+        
         flash[:notice] = 'Group was successfully created.'
         format.html { redirect_to(edit_account_group_path(@account, @group)) }
         format.xml  { render :xml => @group, :status => :created, :location => [@account, @group] }
@@ -131,11 +161,16 @@ class GroupsController < ApplicationController
   # DELETE /groups/1
   # DELETE /groups/1.xml
   def destroy
-    @group = Group.find(params[:id])
-    @group.destroy
-
+    @group = @account.filters.find(params[:id])
+    if @group.default_group?
+      flash[:notice] = 'Cannot delete your default group.'
+    else
+      @group.destroy
+      flash[:notice] = 'Group was successfully deleted.'
+    end
+    
     respond_to do |format|
-      format.html { redirect_to(groups_url) }
+      format.html { redirect_to(@account) }
       format.xml  { head :ok }
     end
   end

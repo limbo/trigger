@@ -5,7 +5,7 @@
 	<ul>
 		<% for account in @accounts do -%>
 		<li>Twitter account: <%=link_to account.login, "/accounts/view/#{account.id}"%> 
-			<%= account.groups.count %> Groups. 
+			<%= account.filters.count %> Filters. 
 			Actions: 
 			<%= link_to 'Info', account_info_url(account) %> |
 			<%= link_to 'Edit', edit_account_path(account) %> |

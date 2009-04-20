@@ -1,0 +1,5 @@
+<%= link_to_function image_tag('filter.png') + trim_text(h(filter.filter_name), 13), "switchFilter(#{i}, #{filter.id});", {:title => h(filter.filter_name), :class => 'group-link'} %>
+	<p class='group-actions'>
+	<%= link_to image_tag('mini-edit.png', {:title => 'Edit Filter'}), edit_account_query_filter_path(@account, filter) %> |
+	<%= link_to image_tag('mini-trash.png', {:title => 'Delete Filter'}), account_query_filter_path(@account, filter), :confirm => 'Are you sure? There is no undo.', :method => :delete %>
+	</p>

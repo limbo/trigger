@@ -34,10 +34,10 @@ class AccountsController < ApplicationController
     end
     
     if @account.nil?
-      redirect_to :manage and return
+      redirect_to :action => 'manage' and return
     end
     
-    @groups = Group.find_all_by_owner_id(@account.id)
+    @filters = @account.filters
     if current_user.last_account != @account
       current_user.last_account = @account
       current_user.save
@@ -72,7 +72,7 @@ class AccountsController < ApplicationController
     validated = validate_twitter_account(@account)
     if validated
       @account.sync
-    
+      
       respond_to do |format|
         if @account.save
           # set default account on owner if none set yet.
@@ -80,6 +80,12 @@ class AccountsController < ApplicationController
             @account.owner.last_account = @account
             @account.owner.save
           end
+          
+          # create default group
+          default_group = @account.create_default_group
+          @account.last_group = default_group
+          @account.save
+          
 #          msgs = fetch_messages @account
 # TODO: add asynchronous message import at this point.
           flash[:notice] = "Account was successfully registered."
@@ -108,7 +114,7 @@ class AccountsController < ApplicationController
     @account.destroy
 
     respond_to do |format|
-      format.html { redirect_to(accounts_url) }
+      format.html { redirect_to(manage_accounts_url) }
       format.xml  { head :ok }
     end
   end

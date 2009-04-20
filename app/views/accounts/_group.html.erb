@@ -1,0 +1,9 @@
+<%= link_to_function image_tag('group.png') + trim_text(h(filter.filter_name), 13), "switchGroup(#{i}, #{filter.id});", {:title => h(filter.filter_name), :class => 'group-link'} %>
+	<% if filter.default_group? -%>
+	<p class='group-actions'>All friends</p>
+	<% else -%>
+	<p class='group-actions'>
+	<%= link_to image_tag('mini-edit.png', {:title => 'Edit Group Membership'}), edit_account_group_path(@account, filter) %> |
+	<%= link_to image_tag('mini-trash.png', {:title => 'Delete Group'}), account_group_path(@account, filter), :confirm => 'Are you sure? There is no undo.', :method => :delete %>
+	</p>
+	<% end %>

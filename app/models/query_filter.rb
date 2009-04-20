@@ -1,0 +1,2 @@
+class QueryFilter < ContentFilter
+end
