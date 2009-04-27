@@ -38,7 +38,18 @@
 		<span class="meta entry-meta">
 			<a href="http://twitter.com/<%=h twit.sender.login %>/status/<%= twit.message_id%>/" rel="bookmark">
 				<abbr class="updated published" title="<%= twit.created_at%>"><%= time_ago_in_words twit.created_at%> ago</abbr>
-			</a> from <span class="generator">web</span>
+			</a> 
+			from <span class="generator">web</span>
+			<% if !!twit.in_reply_to_update_id && twit.in_reply_to_account%>
+			<a href='http://twitter.com/<%= twit.in_reply_to_account.login%>/status/<%= twit.in_reply_to_update_id%>'>
+				in reply to <%= twit.in_reply_to_account.login %></a>.
+			<% elsif twit.in_reply_to_account %>
+				<a href='http://twitter.com/<%= twit.in_reply_to_account.login%>'>
+				in reply to <%= twit.in_reply_to_account.login %></a>.
+			<% end %>
+			<% if twit.is_mention_of?(@account) %>
+			mention: <%= twit.is_mention_of?(@account) %>
+			<% end %>
 		</span>
 	</span>
 </li>

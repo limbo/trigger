@@ -1,0 +1,38 @@
+<div class="columns">
+  	<div id="content">
+		<div class="inner-wrapper hfeed">
+			<% if @updates.nil? || @updates.empty? -%>
+			<p>
+				No messages from <%= @group_name%>.
+			</p>
+			<% else -%>
+				<ol class="updates">
+					<% for msg in @updates do -%>
+							<%=render :partial => 'messages/twit', :locals => {:twit => msg}%>
+					<% end -%>
+				</ol>
+			<% end -%>
+		</div>
+	</div>
+	
+	<div id="sidebar">
+		<div class='section'>
+			<div class='hd'>
+				<h3>Group: <%= @filter_name %></h3>
+			</div>
+			<div class='bd'>
+				<form id="search-form" action="<%= url_for group_search_path(@account, @group)%>" method="get"><fieldset>
+			        <input type="text" id="search" name="q" />
+			        <input type="submit" value="search" />
+			      </fieldset></form>
+				<ul>
+					<% for member in @members do -%>
+					<li>
+						<%= link_account(member, false) %>
+					</li>
+					<% end -%>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

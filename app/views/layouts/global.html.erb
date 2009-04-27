@@ -5,7 +5,7 @@
 <head>
   <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
   <title>Trig.gr</title>
-  <%= stylesheet_link_tag 'triggr' %>
+  <%= stylesheet_link_tag 'triggr', 'tabs' %>
   <%= javascript_include_tag :defaults %>
 </head>
 <body>
@@ -13,7 +13,7 @@
 	    <h1 id="logo"><a href="/accounts">Trig.gr</a></h1>
 	    <div class="navactions"><ul class="nav">
 	      <li>
-	      <form id="search-form" action="/messages/search" method="get"><fieldset>
+	      <form id="search-form" action="<%= logged_in? ? "/accounts/#{@account.id}/messages/search" : "/messages/search"%>" method="get"><fieldset>
 	        <input type="text" id="search" name="q" />
 	        <input type="submit" value="search" />
 	      </fieldset></form>

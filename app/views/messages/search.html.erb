@@ -1,35 +1,40 @@
-<div class="columns">
-  	<div id="content">
-		<div class="inner-wrapper hfeed">
-			<div class="content-header"><h1>Search results</h1></div>
-			<% if @messages.nil? || @messages.empty? -%>
-			<p>
-				No matching messages found.
-			</p>
-			<% else -%>
-				<ol id="updates">
-				<% for msg in @messages do -%>
-						<%=render :partial => 'twit', :locals => {:twit => msg}%>
-				<% end -%>
-				</ol>
-			<% end -%>
-		</div>
-	</div>
+<form action="/accounts/view" method="get">
+	Twitter Account: 
+	<select id="account_id" name="id" onchange="this.form.submit();">
+		<% for account in current_user.accounts do -%>
+		<option <%= account.id == @account.id ? 'selected' : '' %> value="<%= account.id%>"><%=h account.login %></option>
+		<% end %>
+	</select>
+</form>	
 	
-	<div id="sidebar">
-		<div class='section'>
-			<div class='hd'>
-				<h2>Viewing Messages From</h2>
-			</div> 
-			<div class='bd'>
-				<ul>
-					<% for member in @members do -%>
-					<li>
-						<%= member.screen_name%>
-					</li>
-					<% end -%>
-				</ul>
-			</div>
-		</div>
-	</div>
+<% default_tab_idx = params[:view] == 'users' ? 2 : 1 -%>
+<div class="tabs" id="group-list">
+<h3>Views</h3>
+<ul>
+  <li class="group-toggle" id="tabHeader1 <%= 'tabHeaderActive' unless params[:view] == 'user'%>">
+		<%= link_to 'Messages', account_search_path(@account, :q => params[:q]) %>
+  </li>
+  <li class="group-toggle" id="tabHeader2 <%= 'tabHeaderActive' if params[:view] == 'user'%>">
+		<%= link_to 'Users', account_search_path(@account, {:q => params[:q], :view => 'user'}) %>
+  </li>
+</ul>
+<% form_tag(account_groups_path(@account), :class => 'toolbar-element') do %>
+<%= hidden_field_tag "group[filter_name]", params[:q]%>
+<%= hidden_field_tag "members", @updates.map{|update| update.sender.id}.uniq.join(',')%>
+<%= image_submit_tag "new_group.png", {:title => 'Create a new group from people in these search results'} %>
+<% end %>
+<% form_tag(account_query_filters_path(@account), :class => 'toolbar-element') do %>
+<%= hidden_field_tag "query_filter[filter_name]", params[:q]%>
+<%= hidden_field_tag "query_filter[query]", params[:q]%>
+<%= image_submit_tag "new_group.png", {:title => 'Create a new filter with this search string'} %>
+<% end %>
+</div>
+
+<div id="group-content">
+	<% if params[:view] == 'user' -%>
+		Click a user's icon to expand or hide updates from that user.
+		<%= render :partial => 'users'%>
+	<% else -%>
+		<%= render :partial => 'updates'%>
+	<% end -%>
 </div>
