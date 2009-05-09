@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 10) do
+ActiveRecord::Schema.define(:version => 15) do
 
   create_table "accounts", :force => true do |t|
     t.integer "owner_id"
@@ -30,16 +30,19 @@ ActiveRecord::Schema.define(:version => 10) do
     t.datetime "updated_at"
   end
 
-  create_table "follows", :id => false, :force => true do |t|
-    t.integer  "follower_id", :null => false
-    t.integer  "followed_id", :null => false
+  create_table "content_filters", :force => true do |t|
+    t.string   "type"
+    t.string   "filter_name"
+    t.integer  "owner_id"
+    t.string   "query"
+    t.integer  "is_default",  :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "groups", :force => true do |t|
-    t.string   "group_name"
-    t.integer  "owner_id"
+  create_table "follows", :id => false, :force => true do |t|
+    t.integer  "follower_id", :null => false
+    t.integer  "followed_id", :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -50,6 +53,9 @@ ActiveRecord::Schema.define(:version => 10) do
     t.string   "message"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "is_mention",             :default => 0
+    t.integer  "in_reply_to_account_id"
+    t.integer  "in_reply_to_update_id"
   end
 
   create_table "users", :force => true do |t|

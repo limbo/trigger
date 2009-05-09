@@ -1,17 +1,47 @@
-* Add dynamic filtering
-* Add filtering by keyword
-* Add group creation by search results
-* Search for friends who mention keyword 'foo'
-* Search twitter for people who mention keyword 'foo'
-* Support add/remove friends from trig.gr
-* Move twit storage to inverse index
-* Compare storage options for twit storage - inverse index vs. relational db vs. combo
-* Add support to edit group's name
-* Store dynamic filters
-* Automate fetching of twits
-* Manage automated fetching of twits to not overflow API limits
-* Manage priorities of tasks
-* Add immediate background tasks
-* Add support for replies/mentions
-* Add replies/mentions filter
-* Fix the default group hack
++ Fix the default group hack
+
++ Add group creation by search results
++ Add support to edit group's name
++ Move twit storage to inverse index
++ Search for friends who mention keyword 'foo'
++ Make global search only search friends
+- add support for hashtags, mentions in search
+
++ Add support for posting from trigger
+- Improve posting interface
+- Add support to post replies
+
+- Search twitter for people who mention keyword 'foo'
+- search twitter for mentions of 'foo'
+
+- Add dynamic filtering
+- Store dynamic filters - view class contains multiple groups.
+
++ Add filtering by keyword
+- Genericize last_group_id
+
+- Support add/remove friends from trig.gr
+
+- support protected twitts
+- make sure search does not show protected twitts i should not see
+? Does this require a ferret index per user?
+
+- Check for updated user details (image, screen_name, etc.)
+- Update default groups with add/removes of friends
+
+- Limit number of group members to display.
+- Add option to expand/collapse view of all group members
+
+- Add paging for updates
+
+- Compare storage options for twit storage - inverse index vs. relational db vs. combo
+
+- Automate fetching of twits
+- Manage automated fetching of twits to not overflow API limits
+- Manage priorities of tasks
+- Add immediate background tasks
+
++ Add support for replies/mentions
+- Add replies/mentions filter
+
+- create API to match twitter/laconi.ca

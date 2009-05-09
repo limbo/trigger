@@ -17,12 +17,14 @@ class QueryFiltersController < ApplicationController
   def show
     @query_filter = @account.filters.find(params[:id])
     
-    @updates = Update.find_with_ferret(@query_filter.query, {:sort => Ferret::Search::SortField.new(:message_id, :type => :integer, :reverse => true)})
+    @updates = Update.find_with_ferret(@query_filter.query, {:limit => 200, :sort => Ferret::Search::SortField.new(:message_id, :type => :integer, :reverse => true)})
     @query_filter_name = @query_filter.filter_name
+    @members = @account.friends
+    @updates.delete_if {|msg| !@members.include?(msg.sender)}
     @members = @updates.group_by(&:sender).keys
     
-    # if (@account.last_query_filter_id != @query_filter.id)
-    #   @account.last_query_filter_id = params[:id]
+    # if (@account.last_group_id != @query_filter.id)
+    #   @account.last_group_id = params[:id]
     #   @account.save
     # end
     

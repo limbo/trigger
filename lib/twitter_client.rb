@@ -6,7 +6,10 @@ require 'time'
 
 module TwitterClient
   protected 
-  
+    def client(account = self)
+      Twitter::Client.new(:login => account.login, :password => account.password)
+    end
+    
     def validate_twitter_account(account)
       puts "Validating account with #{account.login}:#{account.password}"
       client = Twitter::Client.new
@@ -18,6 +21,19 @@ module TwitterClient
       return Twitter::User.find(account.login, client)
     end
 
+    def update_friends(account)
+      friends = fetch_friends(account, p = 0)
+      while !friends.empty? do
+        for friend in friends do 
+          if !account.is_following_by_id?(friend.id)
+            account.add_friend(friend)
+          end
+        end
+        friends = fetch_friends(account, p = p+1)
+      end
+      account.save
+    end
+    
     def fetch_friends(account, page = 1)
       puts "Fetching friends for #{account.login} page: #{page}"
       begin
@@ -39,6 +55,11 @@ module TwitterClient
       end
     end
 
+    def fetch_account_by_id(id)
+      twitter = Twitter::Client.new
+      return twitter.user(friend)
+    end
+    
     def fetch_messages(account)
       begin
   #        config_file = File.join(File.dirname(__FILE__), '..', '..', 'config', 'twitter.yml')
@@ -50,8 +71,14 @@ module TwitterClient
         end
         puts "fetch timeline for user with options: #{options.inspect}"
         @msgs = twitter.timeline_for(:friends, options) do |status|
+          next if Update.find_by_message_id(status.id)
+
           # save message in db
           msg = Update.create(:message_id => status.id, :message => status.text, :created_at => status.created_at)
+          msg.in_reply_to_account = status.in_reply_to_user_id.nil? ? nil : Account.find_or_create(status.in_reply_to_user_id) 
+          msg.in_reply_to_update_id = status.in_reply_to_status_id
+          msg.is_mention = (account.eql? msg.in_reply_to_account)
+          
           sender = Account.find_by_remote_id(status.user.id)
           if (sender.nil?)
             puts status.inspect
@@ -68,7 +95,7 @@ module TwitterClient
         account.save
         puts "done."
       rescue => e
-        logger.error e
+        puts e
       end
       @msgs.count rescue 0
     end

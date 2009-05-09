@@ -8,6 +8,7 @@ namespace :twitter do
     @users = User.find(:all)
     for user in @users do
       for account in user.accounts do
+        update_friends(account)
         fetch_messages(account)
       end
     end

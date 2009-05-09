@@ -1,13 +1,17 @@
 ActionController::Routing::Routes.draw do |map|
   map.group_add_user 'accounts/:account_id/groups/:id/add/:user', :controller => 'groups', :action => 'add'
   map.group_remove_user 'accounts/:account_id/groups/:id/remove/:user', :controller => 'groups', :action => 'remove'
-
+  map.group_search 'accounts/:account_id/groups/:id/search/', :controller => 'groups', :action => 'search'
   map.account_view 'accounts/view', :controller => 'accounts', :action => 'show'
   map.account_info 'accounts/:id/info', :controller => 'accounts', :action => 'info'
   map.manage_accounts 'accounts/manage', :controller => 'accounts', :action => 'manage'
+  map.account_search 'accounts/:account_id/messages/search', :controller => 'messages', :action => 'search'
+  map.account_results 'accounts/:account_id/messages/results', :controller => 'messages', :action => 'search'
+  map.account_post_message 'accounts/:account_id/messages/', :controller => 'messages', :action => 'create'
   map.resources :accounts do |accounts|
     accounts.resources :messages
     accounts.resources :groups
+    accounts.resources :query_filters
   end
 
   

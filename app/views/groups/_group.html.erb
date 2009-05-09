@@ -1,17 +1,26 @@
 <div class="columns">
   	<div id="content">
-		<div class="inner-wrapper hfeed">
-			<% if @updates.nil? || @updates.empty? -%>
-			<p>
-				No messages from <%= @group_name%>.
-			</p>
-			<% else -%>
-				<ol class="updates">
-					<% for msg in @updates do -%>
-							<%=render :partial => 'messages/twit', :locals => {:twit => msg}%>
-					<% end -%>
-				</ol>
+		<div class="inner-wrapper">
+			<div id="post-form">
+			<% form_remote_tag(:url => account_post_message_path(@account)) do -%>
+				<%= text_area_tag 'message', params[:message], {:cols => 75, :rows => 3, :id => 'message-field'}%>
+				<%= submit_tag 'submit', :class => 'post-button' %>
 			<% end -%>
+			</div>
+
+			<div class="hfeed">
+				<% if @updates.nil? || @updates.empty? -%>
+				<p>
+					No messages from <%= @group_name%>.
+				</p>
+				<% else -%>
+					<ol class="updates">
+						<% for msg in @updates do -%>
+								<%=render :partial => 'messages/twit', :locals => {:twit => msg}%>
+						<% end -%>
+					</ol>
+				<% end -%>
+			</div>
 		</div>
 	</div>
 	

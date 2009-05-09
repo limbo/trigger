@@ -6,6 +6,18 @@ class Account < ActiveRecord::Base
   belongs_to :owner, :class_name => 'User', :foreign_key => 'owner_id'
   has_and_belongs_to_many :friends, :class_name => 'Account', :join_table => 'follows', :foreign_key => 'follower_id', :association_foreign_key => 'followed_id', :uniq => true
   belongs_to :last_group, :class_name => 'Group', :foreign_key => 'last_group_id'
+
+  def self.find_or_create(id)
+    account = Account.find_by_remote_id(id)
+    return account unless account.nil?
+    
+    puts "Creating account for id #{id}"
+    remote_account = fetch_account_by_id(id)
+    account = Account.create(:login => remote_account.screen_name, 
+                             :remote_id => remote_account.id, 
+                             :profile_image_url => remote_account.profile_image_url)
+    account.save
+  end  
   
   def create_default_group
     group = Group.create(:filter_name => 'Default Group', :is_default => true)
@@ -34,6 +46,14 @@ class Account < ActiveRecord::Base
     return !self.friends.find_by_remote_id(id).nil?
   end
 
+  def post(message)
+    logger.debug "Posting: #{message}"
+    message = Twitter::Status.create(:text => message, :client => client)
+    logger.debug "Posted. Storing..."
+    Update.store_twit(message)
+    logger.debug "done."
+  end
+  
   def add_friend(user)
     account = Account.find_by_remote_id(user.id) rescue nil
     puts "#{user.screen_name} - #{account.nil? ? 'not found' : 'found'}"

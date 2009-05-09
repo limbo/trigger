@@ -1,4 +1,7 @@
 class MessagesController < ApplicationController
+  before_filter :login_required
+  before_filter :get_account
+  
   def index
     @account = current_user.accounts.find_by_id(params[:account_id])
     
@@ -10,14 +13,16 @@ class MessagesController < ApplicationController
   end
 
   def search
-    @messages = Update.find_with_ferret(params[:q])
-    @members = []
+    @updates = Update.find_with_ferret(params[:q])
+    @members = @account.friends
+    @updates.delete_if {|msg| !@members.include?(msg.sender)}
   end
-  
+
   def new
   end
 
   def create
+    @update = @account.post(params[:message])
   end
 
   def reply

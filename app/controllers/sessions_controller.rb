@@ -14,20 +14,6 @@ class SessionsController < ApplicationController
       end
       redirect_back_or_default(:controller => '/sessions', :action => 'index')
       
-      # update friends on login
-      for account in  current_user.accounts
-        friends = fetch_friends(account, p = 0)
-        while !friends.empty? do
-          for friend in friends do 
-            if !account.is_following?(friend.screen_name)
-              account.add_friend(friend)
-            end
-          end
-          friends = fetch_friends(account, p = p+1)
-        end
-        account.save
-      end
-      
       flash[:notice] = "Logged in successfully"
     end
   end
